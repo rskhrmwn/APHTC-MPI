@@ -1050,5 +1050,61 @@ function celebrate(){
   setTimeout(()=>{box.style.display='none';box.innerHTML='';},2800);
 }
 </script>
+<style>
+.mpi-ov{position:fixed;inset:0;background:rgba(2,44,34,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.mpi-ov[hidden]{display:none}
+.mpi-dlg{width:100%;max-width:400px;background:#fff;border-radius:24px;padding:24px 22px;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:fadeUp .5s ease}
+.mpi-dlg h3{margin:0 0 6px;font-family:Georgia,serif;font-size:1.3rem;color:#065f46}
+.mpi-dlg p{margin:0 0 14px;color:#334155;font-size:.92rem}
+.mpi-dlg label{display:block;font-weight:bold;font-size:.88rem;color:#334155;margin:10px 0 4px}
+.mpi-dlg input{width:100%;min-height:44px;padding:10px 12px;border:2px solid #cbd5e1;border-radius:12px;font-size:16px}
+.mpi-dlg input:focus{outline:none;border-color:#38bdf8}
+.mpi-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.mpi-row button{flex:1 1 140px;min-height:46px;border:none;border-radius:999px;font-weight:bold;cursor:pointer;font-size:.95rem}
+#mpi-send{background:linear-gradient(120deg,#16a34a,#0f766e);color:#fff}
+#mpi-send:disabled{opacity:.4;cursor:not-allowed}
+#mpi-skip{background:#f1f5f9;color:#334155}
+.mpi-note{font-size:.78rem;color:#64748b;margin-top:12px}
+</style>
+<div class="mpi-ov" id="mpi-ov" hidden role="dialog" aria-modal="true" aria-labelledby="mpi-title">
+  <form class="mpi-dlg" id="mpi-form">
+    <h3 id="mpi-title">Halo, calon petualang! 👋</h3>
+    <p>Tulis namamu dan asal sekolahmu dulu ya.</p>
+    <label for="mpi-nama">Nama lengkap</label>
+    <input id="mpi-nama" autocomplete="name" maxlength="100" required>
+    <label for="mpi-sekolah">Asal sekolah</label>
+    <input id="mpi-sekolah" maxlength="120" required>
+    <div class="mpi-row">
+      <button type="button" id="mpi-skip">Lewati</button>
+      <button type="submit" id="mpi-send" disabled>Kirim</button>
+    </div>
+    <p class="mpi-note">Data hanya digunakan untuk pendataan peserta.</p>
+  </form>
+</div>
+<script>
+// Isi dengan URL Web App dari Google Apps Script (lihat langkah setup)
+const APPS_SCRIPT_URL='GANTI_DENGAN_URL_APPS_SCRIPT';
+(function(){
+  const ov=document.getElementById('mpi-ov'),form=document.getElementById('mpi-form');
+  const nama=document.getElementById('mpi-nama'),sekolah=document.getElementById('mpi-sekolah'),send=document.getElementById('mpi-send');
+  function valid(){return nama.value.trim().length>=2&&sekolah.value.trim().length>=3;}
+  function sync(){send.disabled=!valid();}
+  nama.addEventListener('input',sync);sekolah.addEventListener('input',sync);
+  function close(){ov.hidden=true;}
+  document.getElementById('mpi-skip').onclick=close;
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!valid())return;
+    const payload={nama:nama.value.trim(),sekolah:sekolah.value.trim()};
+    if(APPS_SCRIPT_URL.startsWith('https://')){
+      fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)}).catch(function(){});
+    }
+    close();
+  });
+  ov.hidden=false;
+  setTimeout(function(){nama.focus();},300);
+})();
+</script>
+
 </body>
 </html>
